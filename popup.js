@@ -1,6 +1,5 @@
 function generateCodeVerifier() {
-    // Generate proper length PKCE verifier (43-128 characters)
-    const array = new Uint8Array(32); // 32 bytes = 43 base64url chars
+    const array = new Uint8Array(32);
     window.crypto.getRandomValues(array);
     return base64UrlEncode(String.fromCharCode(...array));
 }
@@ -42,14 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const redirectUri = chrome.identity.getRedirectURL();
         console.log("[popup.js] Using redirect URI:", redirectUri);
         
-        // Generate PKCE verifier/challenge
         const codeVerifier = generateCodeVerifier();
         console.log("[popup.js] Generated codeVerifier:", codeVerifier);
         
         const codeChallenge = await generateCodeChallenge(codeVerifier);
         console.log("[popup.js] Generated codeChallenge:", codeChallenge);
         
-        // Save code verifier for later use
         await chrome.storage.local.set({ code_verifier: codeVerifier });
         console.log("[popup.js] Code verifier saved to storage");
         
@@ -72,15 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("[popup.js] Final Spotify auth URL:", authUrl);
         
         try {
-            // Use Chrome's identity API instead of window.open
             const responseUrl = await chrome.identity.launchWebAuthFlow({
                 url: authUrl,
                 interactive: true
             });
             
             console.log("[popup.js] Auth response URL:", responseUrl);
-            
-            // Extract authorization code from response URL
+
             const urlParams = new URLSearchParams(responseUrl.split('?')[1]);
             const authCode = urlParams.get('code');
             const error = urlParams.get('error');
@@ -95,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("[popup.js] Authorization code received:", authCode);
                 statusDiv.textContent = 'Authorization successful! Exchanging code for token...';
                 
-                // Exchange authorization code for access token
                 await exchangeCodeForToken(authCode, codeVerifier, redirectUri);
             }
             
@@ -104,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statusDiv.textContent = 'Authentication failed. Please try again.';
         }
     });
-});
+}); 
 
 async function exchangeCodeForToken(authCode, codeVerifier, redirectUri) {
     const clientId = 'ddfe25c5a2a84c1c92a2cc004312bd6d';
@@ -141,15 +135,23 @@ async function exchangeCodeForToken(authCode, codeVerifier, redirectUri) {
         console.log("[popup.js] Token response:", tokenResponse);
         
         if (tokenResponse.access_token) {
-            // Save tokens to storage
+        
             await chrome.storage.local.set({
-                access_token: tokenResponse.access_token,
-                refresh_token: tokenResponse.refresh_token,
-                expires_at: Date.now() + (tokenResponse.expires_in * 1000)
-            });
+            spotify_access_token: tokenResponse.access_token,  // ← Correct key name
+            refresh_token: tokenResponse.refresh_token,
+            expires_at: Date.now() + (tokenResponse.expires_in * 1000)
+        });
             
             document.getElementById('status').textContent = 'Successfully authenticated with Spotify!';
             console.log("[popup.js] Tokens saved successfully");
+        
+            setTimeout(() => {
+    chrome.tabs.create({
+        url: chrome.runtime.getURL('selectionscreen.html')
+    }, () => {
+    window.close();
+    })
+}); 
         } else {
             console.error("[popup.js] Token exchange failed:", tokenResponse);
             document.getElementById('status').textContent = `Failed to get access token: ${tokenResponse.error}`;

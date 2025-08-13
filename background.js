@@ -41,7 +41,7 @@ async function exchangeAuthCodeForToken(authCode) {
     if (data.access_token) {
       console.log('Access token received:', data.access_token);
       chrome.storage.local.set({
-        access_token: data.access_token,
+        spotify_access_token: data.access_token,
         refresh_token: data.refresh_token,
         expires_in: data.expires_in,
         token_timestamp: Date.now()

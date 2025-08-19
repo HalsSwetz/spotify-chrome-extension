@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mix CD Generator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Kalam:wght@400;700&display=swap');
+    
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+      font-family: 'Share Tech Mono', monospace;
+      color: #fff;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 2px,
+          rgba(255,255,255,0.03) 2px,
+          rgba(255,255,255,0.03) 4px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255,255,255,0.03) 2px,
+          rgba(255,255,255,0.03) 4px
+        );
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h2 {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0 0 10px 0;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 3s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .loading-screen {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .loading-text {
+      font-size: 18px;
+      color: #4ecdc4;
+      margin-bottom: 20px;
+    }
+    
+    .loading-spinner {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(78, 205, 196, 0.3);
+      border-radius: 50%;
+      border-top-color: #4ecdc4;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .cd-container {
+      display: flex;
+      gap: 30px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .cd-title {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .cd-title h1 {
+      font-family: 'Kalam', cursive;
+      font-size: 32px;
+      color: #ff6b6b;
+      text-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+      margin: 0;
+      transform: rotate(-1deg);
+    }
+    
+    .jewel-case {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      backdrop-filter: blur(5px);
+      min-width: 320px;
+    }
+    
+    .tracklist-case {
+      flex: 1;
+      min-width: 320px;
+    }
+    
+    .canvas-case {
+      flex: 1;
+      min-width: 320px;
+    }
+    
+    .case-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #4ecdc4;
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+    }
+    
+    .tracklist {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .track-item {
+      font-family: 'Kalam', cursive;
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 12px;
+      padding: 8px;
+      border-bottom: 1px dotted #ccc;
+      transform: rotate(0.5deg);
+    }
+    
+    .track-item:nth-child(even) {
+      transform: rotate(-0.3deg);
+    }
+    
+    .track-number {
+      font-weight: bold;
+      color: #666;
+      margin-right: 8px;
+    }
+    
+    .track-name {
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .track-artist {
+      color: #666;
+      font-size: 13px;
+    }
+    
+    .canvas-container {
+      position: relative;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .canvas-tools {
+      padding: 15px;
+      border-bottom: 2px solid #eee;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .tool-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: bold;
+    }
+    
+    .color-picker {
+      width: 40px;
+      height: 30px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .brush-size {
+      width: 60px;
+      margin: 0 5px;
+    }
+    
+    .tool-button {
+      padding: 8px 12px;
+      background: #4ecdc4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Share Tech Mono', monospace;
+      transition: background 0.3s;
+    }
+    
+    .tool-button:hover {
+      background: #45b7d1;
+    }
+    
+    .tool-button.active {
+      background: #ff6b6b;
+    }
+    
+    .canvas-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+    
+    #albumCanvas {
+      background: #f8f9fa;
+      cursor: crosshair;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .sticker-panel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      padding: 15px;
+      max-width: 200px;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+    
+    .sticker-panel.active {
+      display: block;
+    }
+    
+    .sticker-panel h4 {
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 14px;
+      text-align: center;
+    }
+    
+    .sticker-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    
+    .sticker {
+      width: 40px;
+      height: 40px;
+      border: 2px solid transparent;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: #f0f0f0;
+      transition: all 0.2s;
+    }
+    
+    .sticker:hover {
+      border-color: #4ecdc4;
+      transform: scale(1.1);
+      background: #e0e0e0;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .action-button {
+      padding: 15px 30px;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(45deg, #4ecdc4, #ff6b6b);
+    }
+    
+    .action-button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    @media (max-width: 768px) {
+      .cd-container {
+        flex-direction: column;
+      }
+      
+      .jewel-case {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>MIX CD GENERATOR</h2>
+    </div>
+    <div id="loadingScreen" class="loading-screen">
+      <div class="loading-text">Generating your personalized Mix CD...</div>
+      <div class="loading-spinner"></div>
+      <div id="loadingStatus" style="margin-top: 20px; font-size: 14px; color: #888;">
+        Analyzing your seed track...
+      </div>
+    </div>
+    <div id="cdContent" class="hidden">
+      <div class="cd-title">
+        <h1 id="cdTitle">Awesome Mix</h1>
+      </div>
+      <div class="cd-container">
+        <div class="jewel-case canvas-case">
+          <div class="case-title">Album Cover</div>
+          <div class="canvas-container">
+            <div class="canvas-tools">
+              <div class="tool-group">
+                <span class="tool-label">Color:</span>
+                <input type="color" id="colorPicker" class="color-picker" value="#000000">
+              </div>
+              <div class="tool-group">
+                <span class="tool-label">Size:</span>
+                <input type="range" id="brushSize" class="brush-size" min="2" max="20" value="5">
+              </div>
+              <button id="drawTool" class="tool-button active">Draw</button>
+              <button id="stickerTool" class="tool-button">Stickers</button>
+              <button id="clearCanvas" class="tool-button">Clear</button>
+            </div>
+            <div class="canvas-area">
+              <canvas id="albumCanvas"></canvas>
+              
+              <div id="stickerPanel" class="sticker-panel">
+                <h4>Click to Add Stickers</h4>
+                <div class="sticker-grid">
+                  <div class="sticker" data-sticker="🎵">🎵</div>
+                  <div class="sticker" data-sticker="🎸">🎸</div>
+                  <div class="sticker" data-sticker="🎤">🎤</div>
+                  <div class="sticker" data-sticker="🎧">🎧</div>
+                  <div class="sticker" data-sticker="⭐">⭐</div>
+                  <div class="sticker" data-sticker="❤️">❤️</div>
+                  <div class="sticker" data-sticker="🔥">🔥</div>
+                  <div class="sticker" data-sticker="✨">✨</div>
+                  <div class="sticker" data-sticker="🌟">🌟</div>
+                  <div class="sticker" data-sticker="💫">💫</div>
+                  <div class="sticker" data-sticker="🎶">🎶</div>
+                  <div class="sticker" data-sticker="💿">💿</div>
+                  <div class="sticker" data-sticker="🎼">🎼</div>
+                  <div class="sticker" data-sticker="🎹">🎹</div>
+                  <div class="sticker" data-sticker="🥁">🥁</div>
+                  <div class="sticker" data-sticker="🎺">🎺</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="jewel-case tracklist-case">
+          <div class="case-title">Track List</div>
+          <div class="tracklist">
+            <div id="tracklistContent">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="saveToSpotify" class="action-button">Save to Spotify</button>
+        <button id="shareCD" class="action-button">Share Mix CD</button>
+        <button id="startOver" class="action-button">Make Another</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('saveToSpotify').addEventListener('click', () => {
+        alert('Save to Spotify functionality coming soon!');
+      });
+      
+      document.getElementById('shareCD').addEventListener('click', () => {
+        alert('Share Mix CD functionality coming soon!');
+      });
+      
+      document.getElementById('startOver').addEventListener('click', () => {
+        window.location.href = 'selectionscreen.html';
+      });
+    });
+  </script>
+  <script src="albumgenerate.js"></script>
+</body>
+</html>

@@ -173,12 +173,7 @@ function proceedWithSelectedTrack(track) {
     }, function() {
         console.log('Seed track stored');
         
-        // TODO: Navigate to Mix CD generation screen
-        // For now, show an alert
-        alert(`Selected "${track.name}" by ${track.artists.map(a => a.name).join(', ')} as your seed track!\n\nNext: Generate Mix CD (screen not yet created)`);
-        
-        // Later this will be:
-        // window.location.href = 'mixcd-generation.html';
+        window.location.href = 'albumgenerate.html';
     });
 }
 

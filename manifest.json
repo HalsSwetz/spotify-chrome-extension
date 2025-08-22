@@ -3,7 +3,13 @@
   "name": "Spotify Mix CD Maker",
   "version": "0.1.0",
   "description": "Generate nostalgic mix CDs from your Spotify songs.",
-  "permissions": ["tabs", "storage", "identity", "activeTab", "scripting"],
+  "permissions": [
+    "tabs", 
+    "storage", 
+    "identity", 
+    "activeTab", 
+    "scripting"
+  ],
   "host_permissions": [
     "https://api.spotify.com/*",
     "https://accounts.spotify.com/*",
@@ -24,6 +30,14 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
-
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["*.html", "*.js", "*.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

@@ -4,25 +4,129 @@
   <meta charset="UTF-8" />
   <title>Spotify Mix CD Maker</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+    
     body {
-      font-family: Arial, sans-serif;
-      width: 300px;
-      padding: 10px;
+      margin: 0;
+      padding: 20px;
+      width: 320px;
+      height: 240px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Share Tech Mono', monospace;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
     }
+    
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 2px,
+          rgba(255,255,255,0.03) 2px,
+          rgba(255,255,255,0.03) 4px
+        );
+      pointer-events: none;
+    }
+    
+    .popup-container {
+      position: relative;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
     h1 {
+      font-family: 'Orbitron', monospace;
       font-size: 18px;
-      margin-bottom: 10px;
+      font-weight: 900;
+      margin: 0 0 20px 0;
+      text-align: center;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientShift 3s ease-in-out infinite;
     }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    #login-btn {
+      padding: 12px 24px;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 14px;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      margin-bottom: 15px;
+    }
+    
+    #login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(45deg, #4ecdc4, #ff6b6b);
+    }
+    
+    #login-btn:disabled {
+      background: #666;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
     #status {
+      font-size: 12px;
+      text-align: center;
+      color: #4ecdc4;
+      text-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
       margin-top: 10px;
-      color: green;
+      line-height: 1.4;
+    }
+    
+    .loading-dots {
+      display: inline-block;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
   </style>
 </head>
 <body>
-  <h1>Spotify Mix CD Maker</h1>
-  <button id="login-btn">Log in to Spotify</button>
-  <div id="status"></div>
+  <div class="popup-container">
+    <h1>MIX CD MAKER</h1>
+    <button id="login-btn">Connect to Spotify</button>
+    <div id="status"></div>
+  </div>
 
   <script src="popup.js"></script>
 </body>

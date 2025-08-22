@@ -382,6 +382,7 @@
     <div class="header">
       <h2>MIX CD GENERATOR</h2>
     </div>
+
     <div id="loadingScreen" class="loading-screen">
       <div class="loading-text">Generating your personalized Mix CD...</div>
       <div class="loading-spinner"></div>
@@ -389,10 +390,12 @@
         Analyzing your seed track...
       </div>
     </div>
+
     <div id="cdContent" class="hidden">
       <div class="cd-title">
         <h1 id="cdTitle">Awesome Mix</h1>
       </div>
+
       <div class="cd-container">
         <div class="jewel-case canvas-case">
           <div class="case-title">Album Cover</div>
@@ -408,7 +411,7 @@
               </div>
               <button id="drawTool" class="tool-button active">Draw</button>
               <button id="stickerTool" class="tool-button">Stickers</button>
-              <button id="clearCanvas" class="tool-button">Clear</button>
+              <button id="undoCanvas" class="tool-button">Undo</button>
             </div>
             <div class="canvas-area">
               <canvas id="albumCanvas"></canvas>
@@ -437,6 +440,7 @@
             </div>
           </div>
         </div>
+
         <div class="jewel-case tracklist-case">
           <div class="case-title">Track List</div>
           <div class="tracklist">
@@ -447,28 +451,13 @@
       </div>
 
       <div class="action-buttons">
+        <button id="startOver" class="action-button">Make New Mix</button>
+        <button id="shareCD" class="action-button">Share Mix</button>
         <button id="saveToSpotify" class="action-button">Save to Spotify</button>
-        <button id="shareCD" class="action-button">Share Mix CD</button>
-        <button id="startOver" class="action-button">Make Another</button>
       </div>
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('saveToSpotify').addEventListener('click', () => {
-        alert('Save to Spotify functionality coming soon!');
-      });
-      
-      document.getElementById('shareCD').addEventListener('click', () => {
-        alert('Share Mix CD functionality coming soon!');
-      });
-      
-      document.getElementById('startOver').addEventListener('click', () => {
-        window.location.href = 'selectionscreen.html';
-      });
-    });
-  </script>
   <script src="albumgenerate.js"></script>
 </body>
 </html>
